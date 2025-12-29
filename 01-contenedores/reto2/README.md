@@ -6,7 +6,7 @@ Puede encontrarse en `backend\Dockerfile`
 
 ## ✅ Comando para construir la imagen
 
-Antes de construir la imagen, nos aseguramos de que las settings apunten al contenedor de `mongodb` en vez de a `localhost`. Como podemos comprobar en `backend\appsettings.json` tenemos esto:
+Antes de construir la imagen, nos aseguramos de que las settings apunten al contenedor de `mongodb` en vez de a `localhost` ya que Docker proporciona resolución DNS automática entre contenedores de la misma red. Como podemos comprobar en `backend\appsettings.json` tenemos esto:
 
     mongodb://admin:password@mongodb:27017
 
