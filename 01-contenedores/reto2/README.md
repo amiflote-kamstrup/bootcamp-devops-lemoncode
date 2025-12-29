@@ -6,9 +6,11 @@ Puede encontrarse en `backend\Dockerfile`
 
 ## ✅ Comando para construir la imagen
 
-Antes de construir la imagen (DEBE HABER UNA FORMA MÁS LIMPIA!!), nos aseguramos de que las settings apunten al contenedor de `mongodb` en vez de a `localhost`. Como podemos comprobar en `backend\appsettings.json` tenemos esto:
+Antes de construir la imagen, nos aseguramos de que las settings apunten al contenedor de `mongodb` en vez de a `localhost`. Como podemos comprobar en `backend\appsettings.json` tenemos esto:
 
     mongodb://admin:password@mongodb:27017
+
+**NOTA**: Idealmente estamos de acuerdo en que es mejor pasar esta información por variables de entorno pero para este propósito académico nos vale con esta configuración.
 
 Entonces, desde powershell en el directorio `backend` el comando para generar la imagen sería:
 
@@ -40,3 +42,61 @@ Y levantamos con
 Una vez tenemos base de datos y backend corriendo, abrimos navegador, vamos a `localhost:5000/api/classes` y nos aparecen las entidades que creamos en el reto anterior, probando así que tenemos bien configurado nuestro flujo de datos usando contenedores.
 
 ![Get classes](./images/reto2-getclasess.png)
+
+## ✅ Optimizando el Dockerfile para obtener una imagen más ligera
+
+Es cierto que nuestra app funciona correctamente pero también lo es que la imagen no respeta la condición de ser una imagen ligera. Con el comando:
+
+    docker images
+
+podemos comprobar que la imagen del backend ocupa 371 MB, lo cual indica que es una imagen ineficiente para albergar la funcionalidad de una API básica. Analizando el `backend/Dockerfile` concluimos que hemos aplicado estas buenas prácticas:
+
+ - Hemos copiado el `csproj` antes que el resto del código, lo que ayuda a cachear este paso que no es tan propenso a cambios como lo puede ser el código fuente.
+ - Hemos hecho uso del concepto de `multistages` que puede ser interesante para separar la generación del ejecutable haciendo uso de la imagen base `sdk` del proceso de generación de la imagen final que no necesita el `sdk` sino el `runtime`, siendo este último más ligero.
+ - Desde el punto de vista de seguridad, usamos un usuario `no-root`.
+
+ Ahora bien, algo bien conocido que no hemos usado es partir de la imagen `alpine` que destaca por ser una imagen extremadamente ligera conteniendo recursos básicos.
+
+ Así, vamos a generar un nuevo `backend/Dockerfile.alpine` con el que buscaremos una imagen más ligera y optimizada.
+
+ Para construir la nueva imagen, desde la carpeta `backend`
+
+    docker build -t backend-alpine:latest -f Dockerfile.alpine .
+
+Y obtenemos así la imagen `backend-alpine:latest`. Veamos una comparativa:
+
+### Resultados
+
+| Métrica | Original | Alpine | Reducción |
+|---------|--------|--------|-----------|
+| Tamaño imagen | 371 MB | 270 MB | **101 MB** |
+| Tamaño runtime | 108 MB | 85.8 MB | **22.2 MB** |
+
+### Optimizaciones implementadas
+
+1. **Multi-stage build**: Separación build/runtime ✓
+2. **Imagen Alpine**: De 371MB a 270MB (27% reducción) ✓
+3. **Runtime optimizado**: De 108MB a 85.8MB en contenedor ✓
+4. **Usuario no-root**: Mejora de seguridad ✓
+
+Vemos que el tamaño de la imagen se ha reducido notablemente aunque personalmente esperaba un mayor descenso. Dejamos algunas líneas de investigación abiertas para reducir aun más el tamaño.
+
+### Optimizaciones posibles (no implementadas)
+
+1. **Self-contained + trimmed**: Podría reducir a ~180MB
+2. **PublishSingleFile**: Un solo ejecutable
+3. **Runtime-deps**: En lugar de aspnet completo
+4. **Eliminar símbolos debug**: /p:DebugSymbols=false
+
+Por último, para comprobar que la nueva imagen sigue siendo funcional, corremos un contenedor usando la nueva imagen pero esta vez corriendo en el puerto 5001 para evitar colisiones con el original
+
+    docker run -d `
+    --name backend-alpine `
+    --network lemoncode-calendar `
+    -p 5001:5000 `
+    -e ASPNETCORE_URLS=http://+:5000 `
+    backend-alpine:latest
+
+Y adjuntamos captura del navegador llamando al método `GET` (nótese el puerto `5001`)
+
+![Get classes](./images/reto2-getclasess-alpine.png)
