@@ -1,0 +1,32 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01-contenedores", "01-contenedores", "{64380BCB-1A26-023A-6AAE-F794C8BB4FBE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "reto2", "reto2", "{8478EDD2-C6D0-D75A-583E-8434F162B5C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backend", "01-contenedores\reto2\backend\backend.csproj", "{54F18F94-C258-89E6-A25A-16BDBB0334AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{54F18F94-C258-89E6-A25A-16BDBB0334AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54F18F94-C258-89E6-A25A-16BDBB0334AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54F18F94-C258-89E6-A25A-16BDBB0334AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54F18F94-C258-89E6-A25A-16BDBB0334AA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8478EDD2-C6D0-D75A-583E-8434F162B5C7} = {64380BCB-1A26-023A-6AAE-F794C8BB4FBE}
+		{54F18F94-C258-89E6-A25A-16BDBB0334AA} = {8478EDD2-C6D0-D75A-583E-8434F162B5C7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D75C6E18-37AE-4467-9246-FEE3E07009C4}
+	EndGlobalSection
+EndGlobal

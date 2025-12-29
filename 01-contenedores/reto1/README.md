@@ -59,5 +59,3 @@ En este momento también es interesante apuntar que si reiniciamos el contenedor
     docker start mongodb
 
 Y volviendo a ejecutar un `GET` podemos comprobar que los datos siguen ahí.
-
-# RETO 2: Dockerizar el backend
