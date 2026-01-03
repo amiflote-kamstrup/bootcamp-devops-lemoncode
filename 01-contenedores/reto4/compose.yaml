@@ -1,0 +1,91 @@
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb # ???, OK?
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    env_file: 
+      - ".env"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - lemoncode-calendar # ???, OK?
+    # healthcheck:
+    #   test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
+
+  # Backend .NET API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend # ???
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file: 
+      - ".env"
+    # environment:
+    #   ASPNETCORE_URLS: http://+:5000
+    #   ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+    #   MONGODB__CONNECTIONSTRING: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-password}@mongodb:27017 # ??? poco seguro
+    #   MONGODB__DATABASENAME: ${MONGO_DATABASE:-LemoncodeCalendar} # ??? LemoncodeCourseDb
+    # depends_on:
+    #   mongodb:
+    #     condition: service_healthy
+    networks:
+      - lemoncode-calendar
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 20s
+
+  # Frontend Express App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile # ??? lo mismo no es necesario si es default name
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file: 
+      - ".env"
+    # environment:
+    #   NODE_ENV: production
+    #   PORT: 3000
+    #   API_URL: http://backend:5000/api/classes
+    # depends_on:
+    #   backend:
+    #     condition: service_healthy
+    networks:
+      - lemoncode-calendar
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:3000"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
+
+# Red compartida
+networks:
+  lemoncode-calendar:
+    name: lemoncode-calendar
+    # Reusa una red existente
+    external: true
+    driver: bridge
+
+# Volúmenes para persistencia
+volumes:
+  mongo-data:
+    # Este parámetro reusa un volumen existente y así no perdemos los datos creados anteriormente
+    external: true
+    # driver: local

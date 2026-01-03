@@ -2,12 +2,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 WORKDIR /src
 
+# Copiar .csprojs 
+COPY *.csproj .
+
+# Limpiar y restaurar (desde cero)
+# RUN rm -rf bin obj && \
+#    dotnet restore --force
+RUN dotnet restore
+
 # Copiar todo
 COPY . .
-
-# Limpiar y restaurar desde cero
-RUN rm -rf bin obj && \
-    dotnet restore --force
 
 # Publicar
 RUN dotnet publish -c Release -o /app/publish
