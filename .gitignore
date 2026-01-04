@@ -45,6 +45,6 @@ msbuild.wrn
 
 
 # Docker
-.dockerignore
-compose.yaml
-Dockerfile
+# .dockerignore
+# compose.yaml
+# Dockerfile
