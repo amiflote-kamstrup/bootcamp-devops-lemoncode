@@ -2,90 +2,77 @@
 services:
   # MongoDB Database
   mongodb:
-    image: mongo:latest
-    container_name: mongodb # ???, OK?
-    restart: unless-stopped
+    image: mongo:latest       # imagen de MongoDB con etiqueta latest
+    container_name: mongodb   # nombre del contenedor
+    restart: unless-stopped   # reinicia siempre y cuando no fueran manualmente parados
     ports:
-      - "27017:27017"
+      - "27017:27017"         # mapeamos puertos [host/container]
     env_file: 
-      - ".env"
+      - ".env"                # especificamos variables de entorno en archivo .env y lo cargamos
     volumes:
-      - mongo-data:/data/db
+      - mongo-data:/data/db   # montamos volumen mongo-data en ruta específica para MongoDB
     networks:
-      - lemoncode-calendar # ???, OK?
-    # healthcheck:
-    #   test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 40s
+      - lemoncode-calendar    # red compartida
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Backend .NET API
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend # ???
-    restart: unless-stopped
+      context: ./backend      # contexto donde encontramos el dockerfile
+    container_name: backend   # nombre del contenedor
+    restart: unless-stopped   # reinicia siempre y cuando no fueran manualmente parados
     ports:
-      - "5000:5000"
+      - "5000:5000"           # mapeamos puertos [host/container]
     env_file: 
-      - ".env"
-    # environment:
-    #   ASPNETCORE_URLS: http://+:5000
-    #   ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
-    #   MONGODB__CONNECTIONSTRING: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-password}@mongodb:27017 # ??? poco seguro
-    #   MONGODB__DATABASENAME: ${MONGO_DATABASE:-LemoncodeCalendar} # ??? LemoncodeCourseDb
-    # depends_on:
-    #   mongodb:
-    #     condition: service_healthy
+      - ".env"                # especificamos variables de entorno en archivo .env y lo cargamos
+    depends_on:
+      mongodb:
+        condition: service_healthy
     networks:
-      - lemoncode-calendar
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 20s
+      - lemoncode-calendar    # red compartida
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/classes"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Frontend Express App
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile # ??? lo mismo no es necesario si es default name
-    container_name: frontend
-    restart: unless-stopped
+      context: ./frontend     # contexto donde encontramos el dockerfile
+    container_name: frontend  # nombre del contenedor
+    restart: unless-stopped   # reinicia siempre y cuando no fueran manualmente parados
     ports:
-      - "3000:3000"
+      - "3000:3000"           # mapeamos puertos [host/container]
     env_file: 
-      - ".env"
-    # environment:
-    #   NODE_ENV: production
-    #   PORT: 3000
-    #   API_URL: http://backend:5000/api/classes
-    # depends_on:
-    #   backend:
-    #     condition: service_healthy
+      - ".env"                # especificamos variables de entorno en archivo .env y lo cargamos
+    depends_on:
+      backend:
+        condition: service_healthy
     networks:
-      - lemoncode-calendar
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:3000"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 30s
+      - lemoncode-calendar    # red compartida
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 # Red compartida
 networks:
   lemoncode-calendar:
-    name: lemoncode-calendar
-    # Reusa una red existente
-    external: true
-    driver: bridge
+    name: lemoncode-calendar  # nombre de la red
+    external: true            # Reusa una red existente
+    # driver: bridge          # Sería necesario si no fuera recurso existente
 
 # Volúmenes para persistencia
 volumes:
-  mongo-data:
-    # Este parámetro reusa un volumen existente y así no perdemos los datos creados anteriormente
-    external: true
-    # driver: local
+  mongo-data:                 # definicion y nombre del volumen
+    external: true            # Reusa un volumen existente y así no perdemos los datos creados anteriormente
+    # driver: local           # Sería necesario si no fuera recurso existente
