@@ -1,7 +1,3 @@
-me he quedado por el paso 5 de deepseek, aunque lo anterior hay que revisarlo
-
-revisa todo lo # ???
-
 # Reto 4: Docker Compose
 ## ✅ Archivo compose.yml completo y documentado con comentarios
 
@@ -15,9 +11,14 @@ Puede encontrarse en `.env`.
 
     docker-compose up -d
 
+![docker-compose up](./images/docker-compose-up.png)
+
 ## ✅ Captura de pantalla de todos los servicios corriendo (docker-compose ps)
 
     docker-compose ps
 
+![docker-compose ps](./images/docker-compose-ps.png)
+
 ## ✅ Captura de pantalla de la aplicación completa en http://localhost:3000
 
+![Vista de curso en webapp](./images/webapp.png)
