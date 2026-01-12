@@ -2,7 +2,42 @@
 
 ## ✅ Archivo Dockerfile del backend
 
-Puede encontrarse en `backend\Dockerfile`
+Puede encontrarse una primera versión en `backend\Dockerfile`. La segunda versión optimizada es `backend\Dockerfile.alpine` que es la versión que adjuntamos aquí. Más adelante se describe el proceso de refinado de la imagen.
+
+    # Dockerfile.alpine
+    FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+    WORKDIR /src
+
+    # Copiar .csprojs 
+    COPY *.csproj .
+
+    # Limpiar y restaurar (desde cero)
+    # RUN rm -rf bin obj && \
+    #    dotnet restore --force
+    RUN dotnet restore
+
+    # Copiar todo
+    COPY . .
+
+    # Publicar
+    RUN dotnet publish -c Release -o /app/publish
+
+    # Runtime
+    FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+    WORKDIR /app
+    EXPOSE 5000
+
+    ENV ASPNETCORE_URLS=http://+:5000 \
+        DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
+    RUN apk add --no-cache icu-libs=76.1-r1
+
+    COPY --from=build /app/publish .
+
+    RUN adduser -u 1000 -D -H dotnetuser && chown -R dotnetuser /app
+    USER dotnetuser
+
+    ENTRYPOINT ["dotnet", "backend.dll"]
 
 ## ✅ Comando para construir la imagen
 
@@ -27,13 +62,15 @@ Y comprobamos que se ha generado la imagen:
     --network lemoncode-calendar `
     -p 5000:5000 `
     -e ASPNETCORE_URLS=http://+:5000 `
-    calendar-backend:latest
+    lemoncode-backend:latest
 
 ## ✅ Prueba REST Client validando que la API responde correctamente
 
 Debemos asegurar que también debe estar corriendo el contenedor de `MongoDB`. Revisamos con:
 
     docker ps
+
+![docker ps](./images/dockerps.jpg)
 
 Y levantamos con
 
