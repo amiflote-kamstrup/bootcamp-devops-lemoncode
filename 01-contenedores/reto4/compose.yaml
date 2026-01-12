@@ -92,11 +92,11 @@ services:
 networks:
   lemoncode-calendar:
     name: lemoncode-calendar  # nombre de la red
-    external: true            # Reusa una red existente
-    # driver: bridge          # Sería necesario si no fuera recurso existente
+    #external: true            # Reusa una red existente
+    driver: bridge          # Sería necesario si no fuera recurso existente
 
 # Volúmenes para persistencia
 volumes:
   mongo-data:                 # definicion y nombre del volumen
-    external: true            # Reusa un volumen existente y así no perdemos los datos creados anteriormente
-    # driver: local           # Sería necesario si no fuera recurso existente
+    #external: true            # Reusa un volumen existente y así no perdemos los datos creados anteriormente
+    driver: local           # Sería necesario si no fuera recurso existente
