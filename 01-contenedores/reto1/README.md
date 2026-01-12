@@ -11,6 +11,8 @@ Y verificamos que se ha creado correctamente:
     docker network ls
     docker network inspect lemoncode-calendar
 
+![docker network ls](./images/network-ls.jpg)
+
 ## ✅ Comando para ejecutar el contenedor de MongoDB
 
 Primero creamos el volumen para persistir los datos
@@ -36,6 +38,8 @@ Luego corremos el contenedor de MongoDB enlazando con el volumen proviamente cre
 Y verificamos que está corriendo correctamente
 
     docker ps
+
+![docker ps](./images/dockerps.jpg)
 
 ## ✅ Configuración de conexión del backend a MongoDB
 
