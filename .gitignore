@@ -48,3 +48,5 @@ msbuild.wrn
 # .dockerignore
 # compose.yaml
 # Dockerfile
+
+node_modules/
